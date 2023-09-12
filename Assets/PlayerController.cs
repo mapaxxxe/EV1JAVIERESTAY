@@ -8,14 +8,16 @@ public class PlayerController : MonoBehaviour
     private Rigidbody2D rb2D;
     public float speed;
     public float jumpForce;
-    public bool isGrounded;
-    // [SerializeField] private FMODUnity.StudioEventEmitter shootAudio;
+    public bool ispaused;
+    public GameObject pausepanel;
+    [SerializeField] private FMODUnity.StudioEventEmitter jumpsound;
 
     // Start is called before the first frame update
     void Start()
     {
         rb2D = GetComponent<Rigidbody2D>();
-        isGrounded = false;
+        ispaused = false;
+        pausepanel.SetActive(false);
     }
 
     // Update is called once per frame
@@ -40,18 +42,34 @@ public class PlayerController : MonoBehaviour
 
     private void Jump(bool pressed)
     {
-        if (isGrounded) {
+        
             rb2D.AddForce(Vector2.up * jumpForce, ForceMode2D.Impulse);
-        }
+            jumpsound.Play();
+        
     }
         
+
+    private void Pause()
+    {
+        if (!ispaused)
+        {
+            pausepanel.SetActive(false);
+            Time.timeScale =1f;
+        }
+
+        else if (ispaused)
+        {
+            pausepanel.SetActive(true);
+            Time.timeScale = 0f;
+        }
+    }
     
 
     private void OnEnable()
     {
         InputManager.OnPlayerMovement += Move;
         InputManager.OnJump += Jump;
-        
+        InputManager.Onpause += Pause;
     }
 
 
@@ -59,7 +77,7 @@ public class PlayerController : MonoBehaviour
     {
         InputManager.OnPlayerMovement -= Move;
         InputManager.OnJump -= Jump;
-
+        InputManager.Onpause -= Pause;
 
 
     }
